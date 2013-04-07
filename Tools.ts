@@ -1,5 +1,9 @@
 ﻿/// <reference path="../jquery/jquery.d.ts" />
 
+// jsTools (shearnie.tools)
+// A little toolbox for my little brain
+// https://github.com/shearnie/jsTools
+
 module shearnie.tools {
 
 	/*************************************************************************************************
