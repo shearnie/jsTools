@@ -58,14 +58,14 @@ module shearnie.tools {
 			return obj;
 		}
 
-		/* send multiple requests as async
+	    /* send multiple requests as async
 		 * usage:
 			var pd = new Array();
 			pd[0] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "steve" }) });
 			pd[1] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "ada" }) });
 			pd[2] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "eb" }) });
 	
-			new fp.tools.Poster().SendAsync(pd, function(numErrs) {
+			new shearnie.tools.Poster().SendAsync(pd, function(numErrs) {
 				console.log(numErrs + ' errors');
 				console.log(pd[2].result);
 			});
