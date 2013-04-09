@@ -290,3 +290,49 @@ var shearnie;
     })(shearnie.tools || (shearnie.tools = {}));
     var tools = shearnie.tools;
 })(shearnie || (shearnie = {}));
+var shearnie;
+(function (shearnie) {
+    (function (tools) {
+        (function (html) {
+            function fillCombo(cbo, items, prompt) {
+                if(cbo == null) {
+                    return;
+                }
+                if(items == null) {
+                    return;
+                }
+                cbo.empty();
+                if(prompt != null) {
+                    cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
+                }
+                items.forEach(function (item) {
+                    if(item.groupHeading != null) {
+                        cbo.append($('<option></option>').attr("value", '').attr("disabled", 'disabled'));
+                        cbo.append('<optgroup label="' + item.groupHeading + '">');
+                    }
+                    if(item.items == null) {
+                        var getItems = null;
+                        try  {
+                            getItems = item.getItems();
+                        } catch (ex) {
+                            if(ex.name != 'TypeError') {
+                                throw ex;
+                            }
+                        }
+                        if(getItems != null) {
+                            item.items = getItems;
+                        }
+                    }
+                    if(item.items != null) {
+                        item.items.forEach(function (i) {
+                            cbo.append($('<option></option>').attr("value", i.value).text(i.display));
+                        });
+                    }
+                });
+            }
+            html.fillCombo = fillCombo;
+        })(tools.html || (tools.html = {}));
+        var html = tools.html;
+    })(shearnie.tools || (shearnie.tools = {}));
+    var tools = shearnie.tools;
+})(shearnie || (shearnie = {}));
