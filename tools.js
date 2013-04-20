@@ -298,12 +298,12 @@ var shearnie;
                 if(cbo == null) {
                     return;
                 }
-                if(items == null) {
-                    return;
-                }
                 cbo.empty();
                 if(prompt != null) {
                     cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
+                }
+                if(items == null) {
+                    return;
                 }
                 items.forEach(function (item) {
                     if(item.groupHeading != null) {
@@ -331,6 +331,15 @@ var shearnie;
                 });
             }
             html.fillCombo = fillCombo;
+            function truncstr(value, length) {
+                if(value.length > length) {
+                    return value.substring(0, length) + '...';
+                } else {
+                    return value;
+                }
+            }
+            html.truncstr = truncstr;
+            ;
         })(tools.html || (tools.html = {}));
         var html = tools.html;
     })(shearnie.tools || (shearnie.tools = {}));

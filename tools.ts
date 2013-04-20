@@ -444,13 +444,14 @@ module shearnie.tools.html {
 							  items: comboData[],
 							  prompt?: string) {
 		if (cbo == null) return;
-		if (items == null) return;
 
 		cbo.empty();
 
 		if (prompt != null)
 			cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
 		
+		if (items == null) return;
+
 		items.forEach((item) => {
 			// group heading
 			if (item.groupHeading != null) {
@@ -465,7 +466,7 @@ module shearnie.tools.html {
 					getItems = item.getItems();
 				} catch (ex) {
 					// pass on if defined but failed
-				    if (ex.name != 'TypeError') throw ex;
+					if (ex.name != 'TypeError') throw ex;
 				}
 				if (getItems != null) item.items = getItems;
 			}
@@ -477,4 +478,12 @@ module shearnie.tools.html {
 				});
 		});
 	}
+
+	// trunc long strings...
+	export function truncstr(value: string, length: number) {
+		if (value.length > length)
+			return value.substring(0, length) + '...';
+		else
+			return value;
+	};
 }
