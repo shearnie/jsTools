@@ -1,4 +1,4 @@
-﻿/// <reference path="../jquery/jquery.d.ts" />
+﻿/// <reference path="Scripts/typings/jquery/jquery.d.ts" />
 
 // jsTools (shearnie.tools)
 // A little toolbox for my little brain
@@ -31,11 +31,11 @@ module shearnie.tools {
 			var obj = null;
 			var error = null;
 
-			var setobj = function (result) {
+			var setobj = (result) => {
 				obj = result;
 			}
 
-			var seterr = function (err) {
+			var seterr = (err) => {
 				error = err;
 			}
 
@@ -46,11 +46,10 @@ module shearnie.tools {
 				dataType: "json",
 				async: false
 			})).then(
-				function (result) {
-					if (result.err != null) throw result.err;
+				result => {
 					setobj(result);
 				},
-				function (err) {
+				err => {
 					seterr(err);
 				});
 
@@ -86,25 +85,22 @@ module shearnie.tools {
 					async: true
 				})).then(
 					result => {
-						if (result.err != null) {
-							pd.error = result.err
-						}
 						pd.result = result;
 						if (!this.checkAnyEmpty(postData)) onCompleted(errCount);
 					},
 					err => {
-						pd.error = err
+						pd.error = err;
 						errCount++;
 						if (!this.checkAnyEmpty(postData)) onCompleted(errCount);
 					});
 			});
 		}
 
-		private checkAnyEmpty(postData: PostData[]): bool {
+		private checkAnyEmpty(postData: PostData[]): boolean {
 			var ret = false;
 			postData.every((pd) => {
 				if (pd.result == null) // no result
-					if (pd.error == null) {// or error
+					if (pd.error == null) { // or error
 						ret = true; // still empty
 						return false;
 					}
@@ -352,7 +348,7 @@ module shearnie.tools {
 			for (i = 0; i < input.length; i += 1) {
 				x = input.charCodeAt(i);
 				output += hex_tab.charAt((x >>> 4) & 0x0F) +
-					hex_tab.charAt(x & 0x0F);
+				hex_tab.charAt(x & 0x0F);
 			}
 			return output;
 		}
@@ -380,7 +376,7 @@ module shearnie.tools {
 			return this.rstr2hex(this.raw_hmac_md5(k, d));
 		}
 
-		md5(val: string, key?: string, raw: bool = false) {
+		md5(val: string, key?: string, raw: boolean = false) {
 			if (!key) {
 				if (!raw) {
 					return this.hex_md5(val);
@@ -449,7 +445,7 @@ module shearnie.tools.html {
 
 		if (prompt != null)
 			cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
-		
+
 		if (items == null) return;
 
 		items.forEach((item) => {
