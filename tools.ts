@@ -24,7 +24,7 @@ module shearnie.tools {
 	}
 
 	export class Poster {
-		// Syncronous, return parsed object
+		// Syncronous, return object
 		SendSync(url: string, data?: any) {
 			if (url == null || url == '') throw 'No target.';
 
@@ -39,13 +39,15 @@ module shearnie.tools {
 				error = err;
 			}
 
-			$.when($.ajax({
-				type: 'POST',
-				url: url,
-				data: data,
-				dataType: "json",
-				async: false
-			})).then(
+			$.when(
+				$.ajax({
+					type: 'POST',
+					url: url,
+					data: data,
+					dataType: "json",
+					async: false
+				}))
+				.then(
 				result => {
 					setobj(result);
 				},
@@ -60,9 +62,9 @@ module shearnie.tools {
 		/* send multiple requests as async
 		 * usage:
 			var pd = new Array();
-			pd[0] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "steve" }) });
-			pd[1] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "ada" }) });
-			pd[2] = new PostData('url/to/post/to', { data: JSON.stringify({ "name": "eb" }) });
+			pd[0] = new PostData('url/to/post/to', { name: "Steve" });
+			pd[1] = new PostData('url/to/post/to', { name: "Ada" });
+			pd[2] = new PostData('url/to/post/to', { name: "Ebi" });
 	
 			new shearnie.tools.Poster().SendAsync(pd, function(numErrs) {
 				console.log(numErrs + ' errors');
@@ -77,13 +79,15 @@ module shearnie.tools {
 			var errCount: number = 0;
 			postData.forEach((pd) => {
 				pd.result = null; pd.error = null;
-				$.when($.ajax({
-					type: 'POST',
-					url: pd.url,
-					data: pd.data,
-					dataType: "json",
-					async: true
-				})).then(
+				$.when(
+					$.ajax({
+						type: 'POST',
+						url: pd.url,
+						data: pd.data,
+						dataType: "json",
+						async: true
+					}))
+					.then(
 					result => {
 						pd.result = result;
 						if (!this.checkAnyEmpty(postData)) onCompleted(errCount);
@@ -109,7 +113,7 @@ module shearnie.tools {
 			return ret;
 		}
 
-		findPostData(postData: PostData[], hashToMatch: string): PostData {
+		public findPostData(postData: PostData[], hashToMatch: string): PostData {
 			var ret: PostData = null;
 			postData.every((pd) => {
 				if (pd.hashid == hashToMatch) {
@@ -120,6 +124,97 @@ module shearnie.tools {
 			});
 			return ret;
 		}
+	}
+
+
+
+
+	module shearnie.tools.html {
+
+		/* fill combo list
+		 * usage:
+
+			var pets: shearnie.tools.html.comboData[] = [];
+			pets.push({
+				groupHeading: "Dogs",
+				getItems: () => {
+					var ret: shearnie.tools.html.comboItem[] = [];
+					model.dogs.forEach((item) => {
+						ret.push({ value: item.id, display: item.name });
+					})
+					return ret;
+				}
+			});
+			pets.push({
+				groupHeading: "Cats",
+				getItems: () => {
+					var ret: shearnie.tools.html.comboItem[] = [];
+					model.cats.forEach((item) => {
+						ret.push({ value: item.id, display: item.name });
+					})
+					return ret;
+				}
+			});
+
+			shearnie.tools.html.fillCombo($("#pets-combo"), pets, "Select your pet");
+		*/
+		export interface comboData {
+			groupHeading?: string;
+			getItems?: () => comboItem[];
+			items?: comboItem[];
+		}
+
+		export interface comboItem {
+			value: any;
+			display: string;
+		}
+
+		export function fillCombo(cbo: JQuery,
+			items: comboData[],
+			prompt?: string) {
+			if (cbo == null) return;
+
+			cbo.empty();
+
+			if (prompt != null)
+				cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
+
+			if (items == null) return;
+
+			items.forEach((item) => {
+				// group heading
+				if (item.groupHeading != null) {
+					cbo.append($('<option></option>').attr("value", '').attr("disabled", 'disabled'));
+					cbo.append('<optgroup label="' + item.groupHeading + '">');
+				}
+
+				// try to get if not specified (or intended to be set in getItems)
+				if (item.items == null) {
+					var getItems: comboItem[] = null;
+					try {
+						getItems = item.getItems();
+					} catch (ex) {
+						// pass on if defined but failed
+						if (ex.name != 'TypeError') throw ex;
+					}
+					if (getItems != null) item.items = getItems;
+				}
+
+				// now fill items
+				if (item.items != null)
+					item.items.forEach((i) => {
+						cbo.append($('<option></option>').attr("value", i.value).text(i.display));
+					});
+			});
+		}
+
+		// trunc long strings...
+		export function truncstr(value: string, length: number) {
+			if (value.length > length)
+				return value.substring(0, length) + '...';
+			else
+				return value;
+		};
 	}
 
 
@@ -390,96 +485,4 @@ module shearnie.tools {
 		}
 	}
 
-}
-
-
-
-
-
-module shearnie.tools.html {
-
-	/* fill combo list
-	 * usage:
-
-		var pets: shearnie.tools.html.comboData[] = [];
-		pets.push({
-			groupHeading: "Dogs",
-			getItems: () => {
-				var ret: shearnie.tools.html.comboItem[] = [];
-				model.dogs.forEach((item) => {
-					ret.push({ value: item.id, display: item.name })
-				})
-				return ret;
-			}
-		});
-		pets.push({
-			groupHeading: "Cats",
-			getItems: () => {
-				var ret: shearnie.tools.html.comboItem[] = [];
-				model.cats.forEach((item) => {
-					ret.push({ value: item.id, display: item.name })
-				})
-				return ret;
-			}
-		});
-
-		shearnie.tools.html.fillCombo($("#pets-combo"), pets, "Select your pet");
-	*/
-	export interface comboData {
-		groupHeading?: string;
-		getItems?: () => comboItem[];
-		items?: comboItem[];
-	}
-
-	export interface comboItem {
-		value: any;
-		display: string;
-	}
-
-	export function fillCombo(cbo: JQuery,
-							  items: comboData[],
-							  prompt?: string) {
-		if (cbo == null) return;
-
-		cbo.empty();
-
-		if (prompt != null)
-			cbo.append($('<option>' + prompt + '</option>').attr("value", '').attr("disabled", 'disabled').attr("selected", 'selected'));
-
-		if (items == null) return;
-
-		items.forEach((item) => {
-			// group heading
-			if (item.groupHeading != null) {
-				cbo.append($('<option></option>').attr("value", '').attr("disabled", 'disabled'));
-				cbo.append('<optgroup label="' + item.groupHeading + '">');
-			}
-
-			// try to get if not specified (or intended to be set in getItems)
-			if (item.items == null) {
-				var getItems: comboItem[] = null;
-				try {
-					getItems = item.getItems();
-				} catch (ex) {
-					// pass on if defined but failed
-					if (ex.name != 'TypeError') throw ex;
-				}
-				if (getItems != null) item.items = getItems;
-			}
-
-			// now fill items
-			if (item.items != null)
-				item.items.forEach((i) => {
-					cbo.append($('<option></option>').attr("value", i.value).text(i.display));
-				});
-		});
-	}
-
-	// trunc long strings...
-	export function truncstr(value: string, length: number) {
-		if (value.length > length)
-			return value.substring(0, length) + '...';
-		else
-			return value;
-	};
 }
